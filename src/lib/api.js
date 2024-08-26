@@ -1,5 +1,6 @@
 const language = "en";
-const URL_API = `https://www.rijksmuseum.nl/api/${language}/collection?key=hzmILNcD`;
+const API_KEY = import.meta.env.VITE_API_KEY;
+const URL_API = `https://www.rijksmuseum.nl/api/${language}/collection?key=${API_KEY}`;
 
 export async function getByName(queryName) {
   const response = await fetch(`${URL_API}&q=${queryName}`);
