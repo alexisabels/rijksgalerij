@@ -41,6 +41,7 @@ const App = () => {
                 margin: "10px 0",
                 color: "#333",
                 paddingY: 2.5,
+                transition: "color 0.3s ease, text-shadow 0.3s ease",
                 "&:hover": {
                   textShadow: "0 1px 3px rgba(0, 0, 0, 0.25)",
                   color: "#000",

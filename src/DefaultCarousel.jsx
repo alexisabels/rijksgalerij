@@ -3,6 +3,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./DefaultCarousel.css";
+import { Link } from "react-router-dom";
 function SampleNextArrow(props) {
   const { className, style, onClick } = props;
   return (
@@ -47,14 +48,19 @@ function DefaultCarousel({ art }) {
         <Slider {...settings}>
           {art.map((artObject) => (
             <div key={artObject.id} className="slick-slide">
-              <div className="slide-content">
-                <img
-                  src={artObject.webImage?.url}
-                  alt={artObject.title}
-                  className="carousel-image"
-                />
-                <p className="slide-title">{artObject.longTitle}</p>
-              </div>
+              <Link
+                to={`/art/${artObject.objectNumber}`}
+                key={artObject.objectNumber}
+              >
+                <div className="slide-content">
+                  <img
+                    src={artObject.webImage?.url}
+                    alt={artObject.title}
+                    className="carousel-image"
+                  />
+                  <p className="slide-title">{artObject.longTitle}</p>
+                </div>
+              </Link>
             </div>
           ))}
         </Slider>
