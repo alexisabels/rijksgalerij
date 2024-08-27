@@ -45,7 +45,7 @@ function ArtDetails() {
         alignItems="center"
       >
         <Box flex={1}>
-          <Typography variant="h4" gutterBottom>
+          <Typography variant="h5" gutterBottom>
             {longTitle}
           </Typography>
           <Typography

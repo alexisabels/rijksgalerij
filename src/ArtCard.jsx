@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 
-function ArtCard({ title, author, imageUrl, artId, date }) {
+function ArtCard({ title, author, imageUrl, artId }) {
   return (
     <Card
       sx={{
@@ -25,7 +25,7 @@ function ArtCard({ title, author, imageUrl, artId, date }) {
           {title}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {author}, {date}
+          {author}
         </Typography>
       </CardContent>
       <CardActions>
