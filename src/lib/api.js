@@ -1,8 +1,7 @@
-import { data } from "autoprefixer";
-
 const language = "en"; //futuro: añadir opcion cambiar idioma (solo en/nl)
 const API_KEY = import.meta.env.VITE_API_KEY;
 const URL_API = `https://www.rijksmuseum.nl/api/${language}/collection?key=${API_KEY}`;
+
 export async function getByName(queryName) {
   try {
     const response = await fetch(`${URL_API}&q=${queryName}`);
@@ -35,38 +34,14 @@ export async function getById(id) {
   }
 }
 
-export async function printNightwatch() {
+export async function getByMaker(queryMaker) {
   try {
-    const response = await fetch(`${URL_API}&q=nightwatch`);
-    const data = await response.json();
-    console.log(data);
-
-    return data.artObjects.map((artObject) => ({
-      title: artObject.title || "No title",
-      author: artObject.principalOrFirstMaker || "Unknown author",
-      imageUrl: artObject.webImage ? artObject.webImage.url : "/noimage.png",
-    }));
+    const response = await fetch(`${URL_API}&involvedMaker=${queryMaker}`);
+    const art = await response.json();
+    console.log(art);
+    return art;
   } catch (error) {
     console.error("Error fetching data:", error);
-    return data;
+    return null;
   }
-}
-// export async function getByName(queryName) {
-//   const response = await fetch(`${URL_API}&q=${queryName}`);
-//   const data = await response.json();
-//   const artObject = data.artObjects[0];
-
-//   return {
-//     title: artObject.title,
-//     author: artObject.principalOrFirstMaker,
-//     longTitle: artObject.longTitle,
-//     imageUrl: artObject.webImage.url,
-//   };
-// }
-// ¿filtrar por autor?
-export async function getByMaker(queryMaker) {
-  const data = await fetch(`${URL_API}&involvedMaker=${queryMaker}`);
-  const art = await data.json();
-  console.log(art);
-  return art;
 }

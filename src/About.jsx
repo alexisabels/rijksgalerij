@@ -1,5 +1,4 @@
-import { Box, Typography, Link, Button } from "@mui/material";
-import { printNightwatch } from "./lib/api";
+import { Box, Typography, Link } from "@mui/material";
 
 function About() {
   return (
@@ -42,7 +41,6 @@ function About() {
         The goal is to provide an easy and accessible way for users to discover
         and appreciate the museum&apos;s vast collection.
       </Typography>{" "}
-      <Button onClick={printNightwatch}>nightwatch</Button>
     </Box>
   );
 }
