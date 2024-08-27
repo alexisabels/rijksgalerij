@@ -38,54 +38,72 @@ function ArtDetails() {
   } = artDetails;
 
   return (
-    <Box padding={2} maxWidth="100vh">
-      <Stack
-        direction={{ xs: "column-reverse", sm: "row" }}
-        spacing={2}
+    <Box
+      padding={2}
+      maxWidth="100%"
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      maxHeight="100vh"
+    >
+      <Box
+        width="100%"
+        maxWidth="1200px"
+        display="flex"
+        flexDirection="column"
         alignItems="center"
+        padding={2}
+        boxSizing="border-box"
       >
-        <Box flex={1}>
-          <Typography variant="h5" gutterBottom>
-            {longTitle}
-          </Typography>
-          <Typography
-            variant="subtitle1"
-            style={{ color: "gray" }}
-            gutterBottom
-          >
-            {label?.makerLine}
-          </Typography>
-          <Typography variant="body1">
-            {plaqueDescriptionEnglish || description}
-          </Typography>
-          <Stack direction="row" spacing={1} marginTop={2}>
-            <Chip
+        <Stack
+          direction={{ xs: "column-reverse", sm: "row" }}
+          spacing={2}
+          alignItems="center"
+          width="100%"
+        >
+          <Box flex={1} padding={2}>
+            <Typography variant="h5" gutterBottom>
+              {longTitle}
+            </Typography>
+            <Typography
+              variant="subtitle1"
               style={{ color: "gray" }}
-              label={dating?.presentingDate || "Date Unknown"}
-            />
-            <Chip
-              style={{ color: "gray" }}
-              label={`${dimensions?.[0]?.value || "0"} x ${
-                dimensions?.[1]?.value || "0"
-              } x ${dimensions?.[2]?.value || "0"} cm`}
-            />
-            <Chip
-              style={{ color: "gray" }}
-              label={physicalMedium || "Medium Unknown"}
-              sx={{ textTransform: "capitalize" }}
-            />
-          </Stack>
-        </Box>
-        <Box flex={1} display="flex" justifyContent="center">
-          {webImage && (
-            <img
-              src={webImage.url}
-              alt={longTitle}
-              style={{ maxWidth: "100%", height: "auto", maxHeight: "60vh" }}
-            />
-          )}
-        </Box>
-      </Stack>
+              gutterBottom
+            >
+              {label?.makerLine}
+            </Typography>
+            <Typography variant="body1" sx={{ textAlign: "justify" }}>
+              {plaqueDescriptionEnglish || description}
+            </Typography>
+            <Stack direction="row" spacing={1} marginTop={2}>
+              <Chip
+                style={{ color: "gray" }}
+                label={dating?.presentingDate || "Date Unknown"}
+              />
+              <Chip
+                style={{ color: "gray" }}
+                label={`${dimensions?.[0]?.value || "0"} x ${
+                  dimensions?.[1]?.value || "0"
+                } x ${dimensions?.[2]?.value || "0"} cm`}
+              />
+              <Chip
+                style={{ color: "gray" }}
+                label={physicalMedium || "Medium Unknown"}
+                sx={{ textTransform: "capitalize" }}
+              />
+            </Stack>
+          </Box>
+          <Box flex={1} display="flex" justifyContent="center" padding={2}>
+            {webImage && (
+              <img
+                src={webImage.url}
+                alt={longTitle}
+                style={{ maxWidth: "100%", height: "auto", maxHeight: "60vh" }}
+              />
+            )}
+          </Box>
+        </Stack>
+      </Box>
     </Box>
   );
 }
