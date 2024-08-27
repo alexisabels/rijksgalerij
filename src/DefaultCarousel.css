@@ -4,6 +4,8 @@
   align-items: center;
   height: 90%;
   width: 100vw;
+  padding-left: 1vh;
+  padding-right: 1vh;
 }
 
 .carousel-slider {
