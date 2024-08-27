@@ -1,4 +1,5 @@
-import { Box, Typography, Link } from "@mui/material";
+import { Box, Typography, Link, Button } from "@mui/material";
+import { printNightwatch } from "./lib/api";
 
 function About() {
   return (
@@ -40,7 +41,8 @@ function About() {
       <Typography paragraph sx={{ textAlign: "justify" }}>
         The goal is to provide an easy and accessible way for users to discover
         and appreciate the museum&apos;s vast collection.
-      </Typography>
+      </Typography>{" "}
+      <Button onClick={printNightwatch}>nightwatch</Button>
     </Box>
   );
 }
