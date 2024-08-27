@@ -14,6 +14,7 @@ const App = () => {
         sx={{
           display: "flex",
           flexDirection: "column",
+          justifyContent: "space-between",
           alignItems: "center",
           textAlign: "center",
           minHeight: "100vh",
@@ -91,6 +92,34 @@ const App = () => {
           </Button>
         </Stack>
         <RoutesManager />
+        <Stack
+          direction="row"
+          gap={5}
+          sx={{
+            marginTop: "auto",
+            paddingBottom: 2,
+          }}
+        >
+          <Typography variant="overline" gutterBottom sx={{ display: "block" }}>
+            MADE BY ALEXISABEL
+          </Typography>{" "}
+          -
+          <Typography variant="overline" gutterBottom sx={{ display: "block" }}>
+            <a
+              href="https://github.com/alexisabels"
+              style={{ color: "inherit" }}
+            >
+              GITHUB
+            </a>{" "}
+            /{" "}
+            <a
+              href="https://linkedin.com/in/alexisabel"
+              style={{ color: "inherit" }}
+            >
+              LINKEDIN
+            </a>
+          </Typography>
+        </Stack>
       </Box>
     </Router>
   );

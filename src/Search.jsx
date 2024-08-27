@@ -51,7 +51,7 @@ function Search() {
               id="queryName"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Enter art name"
+              placeholder="Search by artist or artwork..."
               color="primary"
               sx={{
                 input: { color: "#333" },
@@ -59,6 +59,7 @@ function Search() {
                 borderRadius: 1,
                 width: { xs: "100%", sm: "400px" },
                 "& .MuiOutlinedInput-root": {
+                  height: "100%",
                   "& fieldset": {
                     borderColor: "#ccc",
                   },
@@ -73,6 +74,7 @@ function Search() {
               variant="contained"
               color="secondary"
               sx={{
+                height: "56px",
                 textTransform: "none",
                 backgroundColor: "#333",
                 "&:hover": {
@@ -121,7 +123,7 @@ function Search() {
           </Grid>
         ) : (
           <Typography variant="h6" align="center" color="textSecondary">
-            Introduce un nombre o palabra para realizar tu primera búsqueda
+            Enter a name or keyword to start your first search.
           </Typography>
         )}
       </div>
