@@ -114,7 +114,6 @@ const App = () => {
           direction="row"
           gap={5}
           sx={{
-            paddingY: 2,
             backgroundColor: "#f5f5f5",
             justifyContent: "center",
           }}
