@@ -1,58 +1,99 @@
-import React, { useState, useEffect, cloneElement } from "react";
-import "./App.css";
-import { getByName } from "./lib/api";
-import ArtCard from "./ArtCard";
-import { Input, Stack, TextField } from "@mui/material";
+import { BrowserRouter as Router } from "react-router-dom";
+import { Stack, Typography, Box, Button } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
+import RoutesManager from "./Routes";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import "bootstrap/dist/css/bootstrap.css";
 
-function App() {
-  const [art, setArt] = useState(null);
-  const [query, setQuery] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    const artData = await getByName(query);
-    setArt(artData);
-    setLoading(false);
-  };
-
+const App = () => {
   return (
-    <>
-      <h1>Rijksgalerij</h1>
-      <div className="card">
-        <form onSubmit={handleSubmit}>
-          <Stack direction={"row"} gap={3} margin={0} justifyContent={"center"}>
-            <TextField
-              variant="outlined"
-              type="text"
-              name="queryName"
-              id="queryName"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Enter art name"
-              color="warning"
-              sx={{ input: { color: "white" } }}
-            />
-            <button type="submit">Buscar</button>
-          </Stack>
-        </form>
-      </div>
-      <div>
-        {loading ? (
-          <p>Loading...</p>
-        ) : art ? (
-          <ArtCard
-            title={art.title}
-            author={art.author}
-            imageUrl={art.imageUrl}
-          />
-        ) : (
-          <p>Introduce un nombre o palabra para realizar tu primera búsqueda</p>
-        )}
-      </div>
-    </>
+    <Router>
+      <Box
+        className="App"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center",
+          minHeight: "100vh",
+          padding: 0,
+          margin: 0,
+          backgroundColor: "#f5f5f5",
+        }}
+      >
+        <Typography
+          variant="h1"
+          component="h2"
+          sx={{
+            fontFamily: "Inter, sans-serif",
+            fontSize: "2.5em",
+            lineHeight: 1.1,
+            fontWeight: "bold",
+            margin: "10px 0",
+            color: "#333",
+            paddingY: 2.5,
+          }}
+        >
+          Rijksgalerij
+        </Typography>
+        <Stack
+          direction="row"
+          spacing={2}
+          alignItems="center"
+          justifyContent="center"
+          sx={{ marginBottom: "20px" }}
+        >
+          <Button
+            component={RouterLink}
+            to="/"
+            variant="outlined"
+            sx={{
+              borderColor: "#000",
+              color: "#000",
+              "&:hover": {
+                borderColor: "#333",
+                color: "#333",
+              },
+            }}
+          >
+            Home
+          </Button>
+          <Button
+            component={RouterLink}
+            to="/search"
+            variant="outlined"
+            sx={{
+              borderColor: "#000",
+              color: "#000",
+              "&:hover": {
+                borderColor: "#333",
+                color: "#333",
+              },
+            }}
+          >
+            Search
+          </Button>
+          <Button
+            component={RouterLink}
+            to="/about"
+            variant="outlined"
+            sx={{
+              borderColor: "#000",
+              color: "#000",
+              "&:hover": {
+                borderColor: "#333",
+                color: "#333",
+              },
+            }}
+          >
+            About
+          </Button>
+        </Stack>
+        <RoutesManager />
+      </Box>
+    </Router>
   );
-}
+};
 
 export default App;
