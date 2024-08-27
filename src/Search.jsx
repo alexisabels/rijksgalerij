@@ -122,7 +122,7 @@ function Search() {
             ))}
           </Grid>
         ) : (
-          <Typography variant="h6" align="center" color="textSecondary">
+          <Typography variant="h6" align="center" color="textSecondary" mx={4}>
             Enter a name or keyword to start your first search.
           </Typography>
         )}

@@ -1,4 +1,4 @@
-const language = "en";
+const language = "en"; //futuro: añadir opcion cambiar idioma (solo en/nl)
 const API_KEY = import.meta.env.VITE_API_KEY;
 const URL_API = `https://www.rijksmuseum.nl/api/${language}/collection?key=${API_KEY}`;
 
@@ -9,8 +9,8 @@ export async function getByName(queryName) {
     console.log(data);
 
     return data.artObjects.map((artObject) => ({
-      title: artObject.title || "Sin título",
-      author: artObject.principalOrFirstMaker || "Autor desconocido",
+      title: artObject.title || "No title",
+      author: artObject.principalOrFirstMaker || "Unknown author",
       imageUrl: artObject.webImage ? artObject.webImage.url : "/noimage.png",
     }));
   } catch (error) {
@@ -31,6 +31,7 @@ export async function getByName(queryName) {
 //     imageUrl: artObject.webImage.url,
 //   };
 // }
+// ¿filtrar por autor?
 export async function getByMaker(queryMaker) {
   const data = await fetch(`${URL_API}&involvedMaker=${queryMaker}`);
   const art = await data.json();
