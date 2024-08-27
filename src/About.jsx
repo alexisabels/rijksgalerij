@@ -3,11 +3,11 @@ import { Box, Typography, Link } from "@mui/material";
 function About() {
   return (
     <Box maxWidth="60%" margin="auto" padding={2}>
-      <Typography paragraph>
+      <Typography paragraph sx={{ textAlign: "justify" }}>
         This project is a web application that allows users to explore and
-        search through the Rijksmuseum's art collection.
+        search through the Rijksmuseum&apos;s art collection.
       </Typography>
-      <Typography paragraph>
+      <Typography paragraph sx={{ textAlign: "justify" }}>
         Built with
         <Link
           href="https://react.dev/"
@@ -37,9 +37,9 @@ function About() {
         </Link>
         to fetch and display detailed information about various artworks.
       </Typography>
-      <Typography paragraph>
+      <Typography paragraph sx={{ textAlign: "justify" }}>
         The goal is to provide an easy and accessible way for users to discover
-        and appreciate the museum's vast collection.
+        and appreciate the museum&apos;s vast collection.
       </Typography>
     </Box>
   );
