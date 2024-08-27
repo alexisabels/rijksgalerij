@@ -44,7 +44,7 @@ function ArtDetails() {
       display="flex"
       justifyContent="center"
       alignItems="center"
-      maxHeight="100vh"
+      sx={{ overflow: "hidden" }}
     >
       <Box
         width="100%"
@@ -61,7 +61,11 @@ function ArtDetails() {
           alignItems="center"
           width="100%"
         >
-          <Box flex={1} padding={2}>
+          <Box
+            flex={1}
+            padding={2}
+            sx={{ overflow: "auto", maxHeight: "calc(100vh - 100px)" }} // Adjust this to ensure content doesn't overflow
+          >
             <Typography variant="h5" gutterBottom>
               {longTitle}
             </Typography>
@@ -98,7 +102,12 @@ function ArtDetails() {
               <img
                 src={webImage.url}
                 alt={longTitle}
-                style={{ maxWidth: "100%", height: "auto", maxHeight: "60vh" }}
+                style={{
+                  maxWidth: "100%",
+                  height: "auto",
+                  maxHeight: "60vh",
+                  objectFit: "contain",
+                }}
               />
             )}
           </Box>
