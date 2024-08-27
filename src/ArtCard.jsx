@@ -7,8 +7,9 @@ import {
   CardMedia,
   Typography,
 } from "@mui/material";
+import { Link } from "react-router-dom";
 
-function ArtCard({ title, author, imageUrl }) {
+function ArtCard({ title, author, imageUrl, artId, date }) {
   return (
     <Card
       sx={{
@@ -24,27 +25,32 @@ function ArtCard({ title, author, imageUrl }) {
           {title}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {author}
+          {author}, {date}
         </Typography>
       </CardContent>
       <CardActions>
-        <Button
-          size="small"
-          variant="outlined"
-          sx={{
-            margin: "auto",
-            my: 1,
-            borderColor: "#333",
-            color: "#333",
-            borderRadius: 0,
-            "&:hover": {
-              borderColor: "#000",
-              color: "#000",
-            },
-          }}
+        <Link
+          to={`/art/${artId}`}
+          style={{ textDecoration: "none", margin: "auto" }}
         >
-          Details
-        </Button>
+          <Button
+            size="small"
+            variant="outlined"
+            sx={{
+              margin: "auto",
+              my: 1,
+              borderColor: "#333",
+              color: "#333",
+              borderRadius: 0,
+              "&:hover": {
+                borderColor: "#000",
+                color: "#000",
+              },
+            }}
+          >
+            Details
+          </Button>
+        </Link>
       </CardActions>
     </Card>
   );

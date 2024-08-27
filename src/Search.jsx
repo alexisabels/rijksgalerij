@@ -104,11 +104,13 @@ function Search() {
         ) : art.length > 0 ? (
           <Grid container spacing={4} sx={{ padding: 2 }}>
             {art.map((artItem) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={artItem.title}>
+              <Grid item xs={12} sm={6} md={4} lg={3} key={artItem.artId}>
                 <ArtCard
                   title={artItem.title}
                   author={artItem.author}
                   imageUrl={artItem.imageUrl}
+                  artId={artItem.artId}
+                  date={artItem.date}
                   sx={{
                     borderRadius: 2,
                     boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
