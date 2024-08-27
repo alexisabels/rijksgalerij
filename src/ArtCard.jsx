@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import {
   Button,
   Card,
@@ -6,7 +7,6 @@ import {
   CardMedia,
   Typography,
 } from "@mui/material";
-import React from "react";
 
 function ArtCard({ title, author, imageUrl }) {
   return (
