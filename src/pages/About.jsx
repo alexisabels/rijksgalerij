@@ -8,11 +8,7 @@ function About() {
       margin="auto"
       padding={2}
     >
-      <img
-        src="../public/aboutheader.jpg"
-        width="100%"
-        style={{ marginBottom: 10 }}
-      />
+      <img src="/aboutheader.jpg" width="100%" style={{ marginBottom: 10 }} />
       <Typography paragraph sx={{ textAlign: "justify" }}>
         This project is a web application that allows users to explore and
         search through the Rijksmuseum&apos;s art collection.
