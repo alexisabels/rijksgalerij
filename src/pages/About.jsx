@@ -1,8 +1,18 @@
-import { Box, Typography, Link } from "@mui/material";
+import { Box, Typography, Link, Button } from "@mui/material";
 
 function About() {
   return (
-    <Box maxWidth="60%" margin="auto" padding={2}>
+    <Box
+      border={1}
+      maxWidth={{ xs: "95%", sm: "60%" }}
+      margin="auto"
+      padding={2}
+    >
+      <img
+        src="../public/aboutheader.jpg"
+        width="100%"
+        style={{ marginBottom: 10 }}
+      />
       <Typography paragraph sx={{ textAlign: "justify" }}>
         This project is a web application that allows users to explore and
         search through the Rijksmuseum&apos;s art collection.
@@ -40,7 +50,22 @@ function About() {
       <Typography paragraph sx={{ textAlign: "justify" }}>
         The goal is to provide an easy and accessible way for users to discover
         and appreciate the museum&apos;s vast collection.
-      </Typography>{" "}
+      </Typography>
+      <Button
+        to="https://www.rijksmuseum.nl/en"
+        variant="outlined"
+        sx={{
+          borderColor: "#333",
+          color: "#333",
+          borderRadius: 0,
+          "&:hover": {
+            borderColor: "#000",
+            color: "#000",
+          },
+        }}
+      >
+        Visit the Rijksmuseum website
+      </Button>
     </Box>
   );
 }

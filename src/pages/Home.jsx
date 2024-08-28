@@ -1,5 +1,5 @@
-import DefaultCarousel from "./DefaultCarousel";
-import data from "../public/homedata.json";
+import DefaultCarousel from "../compontents/DefaultCarousel";
+import data from "../../public/homedata.json";
 import { Box } from "@mui/material";
 
 function Home() {

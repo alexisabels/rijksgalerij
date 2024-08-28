@@ -1,7 +1,6 @@
 import { useState } from "react";
-import "./App.css";
-import { getByName } from "./lib/api";
-import ArtCard from "./ArtCard";
+import { getByName } from "../lib/api";
+import ArtCard from "../compontents/ArtCard";
 import {
   Grid,
   Stack,

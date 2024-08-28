@@ -1,8 +1,8 @@
 import { Route, Routes } from "react-router-dom";
-import Home from "./Home";
-import Search from "./Search";
-import About from "./About";
-import ArtDetails from "./ArtDetails";
+import Home from "./pages/Home";
+import Search from "./pages/Search";
+import About from "./pages/About";
+import ArtDetails from "./pages/ArtDetails";
 const RoutesManager = () => {
   return (
     <Routes>

@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getById } from "./lib/api";
+import { getById } from "../lib/api";
 import { Box, Chip, Stack, Typography } from "@mui/material";
 
 function ArtDetails() {
@@ -64,7 +64,7 @@ function ArtDetails() {
           <Box
             flex={1}
             padding={2}
-            sx={{ overflow: "auto", maxHeight: "calc(100vh - 100px)" }} // Adjust this to ensure content doesn't overflow
+            sx={{ overflow: "auto", maxHeight: "calc(100vh - 100px)" }}
           >
             <Typography variant="h5" gutterBottom>
               {longTitle}
