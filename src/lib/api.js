@@ -197,15 +197,21 @@ function extractMedium(obj) {
 
 const IMAGE_RE = /\.(jpe?g|png|webp|tiff?)(\?|$)/i;
 
+function imageFromAccessPoints(node) {
+  for (const ap of node?.access_point ?? []) {
+    const url = getId(ap);
+    if (url) return url;
+  }
+  return null;
+}
+
 function imageFromRepresentations(reps) {
   for (const rep of reps ?? []) {
     const direct = getId(rep);
     if (direct && IMAGE_RE.test(direct)) return direct;
     for (const dsb of rep?.digitally_shown_by ?? []) {
-      for (const ap of dsb?.access_point ?? []) {
-        const url = getId(ap);
-        if (url) return url;
-      }
+      const ap = imageFromAccessPoints(dsb);
+      if (ap) return ap;
       const dsbId = getId(dsb);
       if (dsbId && IMAGE_RE.test(dsbId)) return dsbId;
     }
@@ -213,23 +219,39 @@ function imageFromRepresentations(reps) {
   return null;
 }
 
+// HumanMadeObject → shows[] → VisualItem → digitally_shown_by[] → DigitalObject
+// → access_point[].id is the actual image URL. Each step is a separate
+// resolver hop because the Rijks Linked Art payloads only return references.
 async function extractImageUrl(obj) {
-  const direct = imageFromRepresentations(obj?.representation);
+  const direct =
+    imageFromRepresentations(obj?.representation) ||
+    imageFromAccessPoints(obj);
   if (direct) return direct;
 
-  // Image data lives on the linked VisualItem; resolve the first one we find.
   for (const visualRef of obj?.shows ?? []) {
     const visualUrl = getId(visualRef);
     if (!visualUrl) continue;
     const visual = await resolveOne(visualUrl);
     if (!visual) continue;
-    const fromVisual =
-      imageFromRepresentations(visual?.representation) ||
-      imageFromRepresentations([visual]);
-    if (fromVisual) return fromVisual;
-    for (const ap of visual?.access_point ?? []) {
-      const url = getId(ap);
-      if (url) return url;
+
+    const inlineRep = imageFromRepresentations(visual?.representation);
+    if (inlineRep) return inlineRep;
+    const inlineAp = imageFromAccessPoints(visual);
+    if (inlineAp) return inlineAp;
+
+    for (const dsb of visual?.digitally_shown_by ?? []) {
+      const ap = imageFromAccessPoints(dsb);
+      if (ap) return ap;
+      const dsbId = getId(dsb);
+      if (!dsbId) continue;
+      if (IMAGE_RE.test(dsbId)) return dsbId;
+
+      const digital = await resolveOne(dsbId);
+      if (!digital) continue;
+      const fromDigital =
+        imageFromAccessPoints(digital) ||
+        imageFromRepresentations(digital?.representation);
+      if (fromDigital) return fromDigital;
     }
   }
   return null;
