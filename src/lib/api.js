@@ -6,7 +6,9 @@
 const SEARCH_API = "https://data.rijksmuseum.nl/search/collection";
 const RESOLVER_HOST = "https://id.rijksmuseum.nl";
 const PLACEHOLDER_IMAGE = "/noimage.png";
-const DEFAULT_PAGE_SIZE = 24;
+// The Search API doesn't accept a page-size parameter (returns 100 per page);
+// we slice client-side to avoid resolving every result individually.
+const DEFAULT_RESULT_LIMIT = 24;
 const TITLE_AAT = "aat/300404670";
 
 async function fetchJson(url) {
@@ -175,16 +177,16 @@ function toCardModel(obj) {
   };
 }
 
-async function searchAndExpand(params) {
+async function searchAndExpand(params, limit = DEFAULT_RESULT_LIMIT) {
   const items = await search(params);
-  const ids = items.map(getId).filter(Boolean);
+  const ids = items.map(getId).filter(Boolean).slice(0, limit);
   const objects = await Promise.all(ids.map(resolveOne));
   return objects.map(toCardModel).filter(Boolean);
 }
 
 export async function getByName(queryName) {
   try {
-    return await searchAndExpand({ q: queryName, pageSize: DEFAULT_PAGE_SIZE });
+    return await searchAndExpand({ q: queryName });
   } catch (error) {
     console.error("Error fetching data:", error);
     return [];
@@ -193,24 +195,31 @@ export async function getByName(queryName) {
 
 export async function getByMaker(queryMaker) {
   try {
-    return await searchAndExpand({
-      creator: queryMaker,
-      pageSize: DEFAULT_PAGE_SIZE,
-    });
+    return await searchAndExpand({ creator: queryMaker });
   } catch (error) {
     console.error("Error fetching data:", error);
     return [];
   }
 }
 
+// The resolver only accepts priref-style numeric IDs or full id.rijksmuseum.nl
+// URLs. Legacy objectNumbers like "SK-C-5" must be looked up via the Search API
+// first.
+function looksLikePriref(value) {
+  return /^\d+$/.test(String(value));
+}
+
 export async function getById(id) {
   try {
-    let raw = await resolveOne(toResolverUrl(id));
+    if (id == null || id === "") return null;
+    const value = String(id);
 
-    // The legacy carousel still routes by objectNumber (e.g. "SK-C-5"); if a
-    // direct resolve fails, fall back to looking it up via the Search API.
-    if (!raw && id && !/^https?:\/\//.test(String(id))) {
-      const items = await search({ objectNumber: id, pageSize: 1 });
+    let raw = null;
+    if (/^https?:\/\//.test(value) || looksLikePriref(value)) {
+      raw = await resolveOne(toResolverUrl(value));
+    }
+    if (!raw) {
+      const items = await search({ objectNumber: value });
       const firstId = getId(items[0]);
       if (firstId) raw = await resolveOne(firstId);
     }
