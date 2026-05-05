@@ -1,20 +1,202 @@
-const language = "en"; //futuro: añadir opcion cambiar idioma (solo en/nl)
-const API_KEY = import.meta.env.VITE_API_KEY;
-const URL_API = `https://www.rijksmuseum.nl/api/${language}/collection?key=${API_KEY}`;
+// Adapter for the Rijksmuseum Linked Open Data API.
+// The legacy `www.rijksmuseum.nl/api/...` endpoint was shut down on 2026-01-05;
+// requests now have to go through the Search API + Persistent Identifier Resolver
+// at data.rijksmuseum.nl. No API key is required.
+
+const SEARCH_API = "https://data.rijksmuseum.nl/search/collection";
+const RESOLVER_HOST = "https://id.rijksmuseum.nl";
+const PLACEHOLDER_IMAGE = "/noimage.png";
+const DEFAULT_PAGE_SIZE = 24;
+const TITLE_AAT = "aat/300404670";
+
+async function fetchJson(url) {
+  const response = await fetch(url, {
+    headers: { Accept: "application/ld+json, application/json" },
+  });
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status} for ${url}`);
+  }
+  return response.json();
+}
+
+async function search(params) {
+  const url = new URL(SEARCH_API);
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null && value !== "") {
+      url.searchParams.set(key, value);
+    }
+  }
+  const data = await fetchJson(url.toString());
+  return Array.isArray(data?.orderedItems) ? data.orderedItems : [];
+}
+
+async function resolveOne(idUrl) {
+  if (!idUrl) return null;
+  try {
+    return await fetchJson(idUrl);
+  } catch {
+    const sep = idUrl.includes("?") ? "&" : "?";
+    try {
+      return await fetchJson(`${idUrl}${sep}_profile=alt`);
+    } catch (error) {
+      console.error("Could not resolve", idUrl, error);
+      return null;
+    }
+  }
+}
+
+function idToSlug(idUrl) {
+  if (!idUrl) return null;
+  return String(idUrl)
+    .replace(/^https?:\/\/[^/]+\//, "")
+    .replace(/\/+$/, "");
+}
+
+function toResolverUrl(idLike) {
+  if (!idLike) return null;
+  const value = String(idLike);
+  if (/^https?:\/\//.test(value)) return value;
+  return `${RESOLVER_HOST}/${value}`;
+}
+
+function getType(node) {
+  return node?.type || node?.["@type"] || "";
+}
+
+function getId(node) {
+  return node?.id || node?.["@id"] || null;
+}
+
+function isClassifiedAs(node, fragment) {
+  const list = node?.classified_as ?? [];
+  return list.some((c) => (getId(c) || "").includes(fragment));
+}
+
+function extractTitle(obj) {
+  const ids = obj?.identified_by ?? [];
+  const names = ids.filter((n) => String(getType(n)).includes("Name"));
+  if (names.length) {
+    const titleish = names.find((n) => isClassifiedAs(n, TITLE_AAT));
+    return (titleish ?? names[0])?.content ?? null;
+  }
+  return obj?._label ?? null;
+}
+
+function extractCreator(obj) {
+  const productions = []
+    .concat(obj?.produced_by ?? [])
+    .concat(obj?.created_by ?? []);
+  for (const prod of productions) {
+    const actors = []
+      .concat(prod?.carried_out_by ?? [])
+      .concat(prod?.part?.flatMap?.((p) => p?.carried_out_by ?? []) ?? []);
+    for (const actor of actors) {
+      const label = actor?._label || actor?.label;
+      if (label) return label;
+      const namedBy = (actor?.identified_by ?? []).find((n) => n?.content);
+      if (namedBy) return namedBy.content;
+    }
+  }
+  return null;
+}
+
+function extractImageUrl(obj) {
+  const reps = obj?.representation ?? [];
+  for (const rep of reps) {
+    const direct = getId(rep);
+    if (direct && /\.(jpe?g|png|webp|tiff?)(\?|$)/i.test(direct)) return direct;
+
+    const dsbList = rep?.digitally_shown_by ?? [];
+    for (const dsb of dsbList) {
+      const accessPoints = dsb?.access_point ?? [];
+      for (const ap of accessPoints) {
+        const url = getId(ap);
+        if (url) return url;
+      }
+      const dsbId = getId(dsb);
+      if (dsbId) return dsbId;
+    }
+
+    const showsList = rep?.shows ?? [];
+    for (const shown of showsList) {
+      const ap = (shown?.access_point ?? [])[0];
+      const url = getId(ap);
+      if (url) return url;
+    }
+  }
+  return null;
+}
+
+function extractDate(obj) {
+  const productions = [].concat(obj?.produced_by ?? []);
+  for (const prod of productions) {
+    const ts = prod?.timespan;
+    if (!ts) continue;
+    if (ts._label) return ts._label;
+    const labelled = (ts.identified_by ?? []).find((n) => n?.content);
+    if (labelled) return labelled.content;
+    const begin = ts.begin_of_the_begin || ts.begin;
+    if (begin) return String(begin).slice(0, 4);
+  }
+  return null;
+}
+
+function extractDescription(obj) {
+  const refs = obj?.referred_to_by ?? [];
+  const text = refs
+    .map((r) => r?.content)
+    .filter(Boolean)
+    .join("\n\n");
+  return text || null;
+}
+
+function extractDimensions(obj) {
+  const dims = obj?.dimension ?? [];
+  return dims.map((d) => ({
+    value: d?.value ?? null,
+    unit: d?.unit?._label ?? null,
+    type: d?.classified_as?.[0]?._label ?? null,
+  }));
+}
+
+function extractMedium(obj) {
+  const made = obj?.made_of ?? [];
+  return made.map((m) => m?._label).filter(Boolean).join(", ") || null;
+}
+
+function toCardModel(obj) {
+  if (!obj) return null;
+  return {
+    title: extractTitle(obj) || "No title",
+    author: extractCreator(obj) || "Unknown author",
+    imageUrl: extractImageUrl(obj) || PLACEHOLDER_IMAGE,
+    artId: idToSlug(getId(obj)),
+    date: extractDate(obj) || " ",
+  };
+}
+
+async function searchAndExpand(params) {
+  const items = await search(params);
+  const ids = items.map(getId).filter(Boolean);
+  const objects = await Promise.all(ids.map(resolveOne));
+  return objects.map(toCardModel).filter(Boolean);
+}
 
 export async function getByName(queryName) {
   try {
-    const response = await fetch(`${URL_API}&q=${queryName}`);
-    const data = await response.json();
-    console.log(data);
+    return await searchAndExpand({ q: queryName, pageSize: DEFAULT_PAGE_SIZE });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return [];
+  }
+}
 
-    return data.artObjects.map((artObject) => ({
-      title: artObject.title || "No title",
-      author: artObject.principalOrFirstMaker || "Unknown author",
-      imageUrl: artObject.webImage ? artObject.webImage.url : "/noimage.png",
-      artId: artObject.objectNumber || "No id found",
-      date: artObject.dating?.sortingDate || " ",
-    }));
+export async function getByMaker(queryMaker) {
+  try {
+    return await searchAndExpand({
+      creator: queryMaker,
+      pageSize: DEFAULT_PAGE_SIZE,
+    });
   } catch (error) {
     console.error("Error fetching data:", error);
     return [];
@@ -23,25 +205,39 @@ export async function getByName(queryName) {
 
 export async function getById(id) {
   try {
-    const URL_COLLECTION = `https://www.rijksmuseum.nl/api/${language}/collection/${id}?key=${API_KEY}`;
-    const response = await fetch(URL_COLLECTION);
-    const data = await response.json();
+    let raw = await resolveOne(toResolverUrl(id));
 
-    return data.artObject || null;
-  } catch (error) {
-    console.error("Error fetching data:", error.message);
-    return null;
-  }
-}
+    // The legacy carousel still routes by objectNumber (e.g. "SK-C-5"); if a
+    // direct resolve fails, fall back to looking it up via the Search API.
+    if (!raw && id && !/^https?:\/\//.test(String(id))) {
+      const items = await search({ objectNumber: id, pageSize: 1 });
+      const firstId = getId(items[0]);
+      if (firstId) raw = await resolveOne(firstId);
+    }
+    if (!raw) return null;
 
-export async function getByMaker(queryMaker) {
-  try {
-    const response = await fetch(`${URL_API}&involvedMaker=${queryMaker}`);
-    const art = await response.json();
-    console.log(art);
-    return art;
+    const title = extractTitle(raw);
+    const author = extractCreator(raw);
+    const imageUrl = extractImageUrl(raw);
+    const date = extractDate(raw);
+    const description = extractDescription(raw);
+    const dimensions = extractDimensions(raw);
+    const medium = extractMedium(raw);
+
+    return {
+      ...raw,
+      longTitle: title || "Untitled",
+      label: { makerLine: author || "Unknown author" },
+      plaqueDescriptionEnglish: description,
+      description,
+      dating: { presentingDate: date },
+      dimensions,
+      physicalMedium: medium,
+      webImage: imageUrl ? { url: imageUrl } : null,
+      artId: idToSlug(getId(raw)),
+    };
   } catch (error) {
-    console.error("Error fetching data:", error);
+    console.error("Error fetching data:", error?.message || error);
     return null;
   }
 }
